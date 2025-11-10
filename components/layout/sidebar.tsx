@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   MapPin,
+  ArrowLeftRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
@@ -28,6 +29,7 @@ const navigationConfig = {
     { name: 'User Management', href: '/admin/users', icon: Users },
     { name: 'Locations', href: '/admin/locations', icon: MapPin },
     { name: 'Inventory', href: '/admin/inventory', icon: Package },
+    { name: 'Stock Movements', href: '/admin/stock-movements', icon: ArrowLeftRight },
     { name: 'Tasks', href: '/admin/tasks', icon: CheckSquare },
     { name: 'Orders & Suppliers', href: '/admin/orders', icon: ShoppingCart },
     { name: 'Analytics & Reports', href: '/admin/reports', icon: BarChart3 },
@@ -37,6 +39,7 @@ const navigationConfig = {
     { name: 'Dashboard', href: '/manager', icon: LayoutDashboard },
     { name: 'Locations', href: '/manager/locations', icon: MapPin },
     { name: 'Inventory', href: '/manager/inventory', icon: Package },
+    { name: 'Stock Movements', href: '/manager/stock-movements', icon: ArrowLeftRight },
     { name: 'Tasks', href: '/manager/tasks', icon: CheckSquare },
     { name: 'Orders & Suppliers', href: '/manager/orders', icon: ShoppingCart },
     { name: 'Reports', href: '/manager/reports', icon: BarChart3 },
@@ -44,6 +47,7 @@ const navigationConfig = {
   Staff: [
     { name: 'Dashboard', href: '/staff', icon: LayoutDashboard },
     { name: 'Inventory', href: '/staff/inventory', icon: Package },
+    { name: 'Stock Movements', href: '/staff/stock-movements', icon: ArrowLeftRight },
     { name: 'My Tasks', href: '/staff/tasks', icon: CheckSquare },
   ],
 }

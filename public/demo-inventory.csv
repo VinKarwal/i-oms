@@ -1,0 +1,16 @@
+SKU,Name,Description,Category,Unit,Barcode,Location,Quantity,MinThreshold,MaxThreshold
+WIDGET-001,Premium Widget A,High-quality red widget for industrial use,Electronics,piece,1234567890123,/main-warehouse,100,20,200
+WIDGET-001,Premium Widget A,High-quality red widget for industrial use,Electronics,piece,1234567890123,/main-warehouse/zone-a,50,10,100
+WIDGET-002,Widget B,Standard blue widget,Electronics,box,1234567890124,/main-warehouse,75,15,150
+GADGET-001,Smart Gadget,IoT enabled smart gadget,Electronics,piece,1234567890125,/main-warehouse,30,5,50
+GADGET-001,Smart Gadget,IoT enabled smart gadget,Electronics,piece,1234567890125,/warehouse-b,20,5,50
+TOOL-001,Power Drill,18V cordless power drill,Tools,piece,1234567890126,/main-warehouse,25,5,30
+TOOL-002,Hammer Set,Professional 5-piece hammer set,Tools,pack,1234567890127,/main-warehouse,40,10,60
+SUPPLY-001,Industrial Glue,Fast-drying industrial adhesive,Supplies,kg,1234567890128,/main-warehouse,200,50,500
+SUPPLY-002,Packaging Tape,Heavy duty 2-inch tape,Supplies,box,1234567890129,/main-warehouse,150,30,300
+SUPPLY-003,Bubble Wrap,100ft bubble wrap roll,Supplies,piece,1234567890130,/main-warehouse,80,20,150
+PART-001,Replacement Motor,Universal replacement motor 12V,Parts,piece,1234567890131,/main-warehouse,15,5,25
+PART-002,Drive Belt,Standard drive belt 24-inch,Parts,piece,1234567890132,/main-warehouse/zone-b,45,10,80
+EQUIP-001,Safety Goggles,ANSI certified safety eyewear,Safety Equipment,piece,1234567890133,/main-warehouse,100,20,150
+EQUIP-002,Hard Hat,Impact-resistant hard hat,Safety Equipment,piece,1234567890134,/main-warehouse,60,15,100
+CHEM-001,Cleaning Solution,Multi-surface cleaning concentrate,Chemicals,l,1234567890135,/main-warehouse,120,25,200
