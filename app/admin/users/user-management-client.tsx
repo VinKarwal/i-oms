@@ -29,7 +29,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Edit, Trash2, Search } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 type Profile = {
@@ -58,9 +57,10 @@ export function UserManagementClient({ initialUsers, roles }: UserManagementClie
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null)
   const [selectedRole, setSelectedRole] = useState<string>('')
+  const [editedName, setEditedName] = useState<string>('')
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const supabase = createClient()
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const filteredUsers = users.filter(
@@ -69,51 +69,82 @@ export function UserManagementClient({ initialUsers, roles }: UserManagementClie
       (user.full_name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   )
 
-  const handleAssignRole = async () => {
-    if (!selectedUser || !selectedRole) return
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return
+    
+    setIsLoading(true)
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role_id: selectedRole })
-      .eq('id', selectedUser.id)
+    try {
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: editedName,
+          role_id: selectedRole || null,
+        }),
+      })
 
-    if (!error) {
+      if (!response.ok) {
+        throw new Error('Failed to update user')
+      }
+
       // Update local state
       setUsers(
         users.map((u) =>
           u.id === selectedUser.id
-            ? { ...u, role_id: selectedRole, roles: roles.find((r) => r.id === selectedRole) || null }
+            ? { 
+                ...u, 
+                full_name: editedName,
+                role_id: selectedRole || null, 
+                roles: selectedRole ? (roles.find((r) => r.id === selectedRole) || null) : null 
+              }
             : u
         )
       )
       setIsEditOpen(false)
       setSelectedUser(null)
       setSelectedRole('')
+      setEditedName('')
       router.refresh()
+    } catch (error) {
+      console.error('Error updating user:', error)
+      alert('Failed to update user. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return
 
-    // Note: In Supabase, deleting a user requires admin API
-    // For now, we'll just remove the role
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role_id: null })
-      .eq('id', selectedUser.id)
+    setIsLoading(true)
 
-    if (!error) {
-      setUsers(users.map((u) => (u.id === selectedUser.id ? { ...u, role_id: null, roles: null } : u)))
+    try {
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user')
+      }
+
+      // Remove user from local state
+      setUsers(users.filter((u) => u.id !== selectedUser.id))
       setIsDeleteOpen(false)
       setSelectedUser(null)
       router.refresh()
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      alert('Failed to delete user. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const openEditDialog = (user: Profile) => {
     setSelectedUser(user)
     setSelectedRole(user.role_id || '')
+    setEditedName(user.full_name || '')
     setIsEditOpen(true)
   }
 
@@ -185,7 +216,7 @@ export function UserManagementClient({ initialUsers, roles }: UserManagementClie
                         variant="ghost"
                         size="icon"
                         onClick={() => openDeleteDialog(user)}
-                        title="Remove role"
+                        title="Delete user"
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -199,16 +230,35 @@ export function UserManagementClient({ initialUsers, roles }: UserManagementClie
         </Table>
       </div>
 
-      {/* Edit Role Dialog */}
+      {/* Edit User Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Assign Role</DialogTitle>
+            <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
-              Assign a role to {selectedUser?.email}
+              Update information for {selectedUser?.email}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                value={selectedUser?.email || ''} 
+                disabled 
+                className="bg-stone-100 dark:bg-stone-900"
+              />
+              <p className="text-xs text-stone-500">Email cannot be changed</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                placeholder="Enter full name"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <Select value={selectedRole} onValueChange={setSelectedRole}>
@@ -231,32 +281,32 @@ export function UserManagementClient({ initialUsers, roles }: UserManagementClie
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+            <Button variant="outline" onClick={() => setIsEditOpen(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button onClick={handleAssignRole} disabled={!selectedRole}>
-              Assign Role
+            <Button onClick={handleUpdateUser} disabled={isLoading}>
+              {isLoading ? 'Updating...' : 'Update User'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Dialog */}
+      {/* Delete User Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove Role</DialogTitle>
+            <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove the role from {selectedUser?.email}? They will need
-              to be reassigned a role to access the system.
+              Are you sure you want to permanently delete {selectedUser?.email}? This action cannot be undone.
+              The user will be removed from the authentication system and all associated data will be deleted.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteUser}>
-              Remove Role
+            <Button variant="destructive" onClick={handleDeleteUser} disabled={isLoading}>
+              {isLoading ? 'Deleting...' : 'Delete User'}
             </Button>
           </DialogFooter>
         </DialogContent>

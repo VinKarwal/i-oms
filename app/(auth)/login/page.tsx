@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
@@ -7,6 +9,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function LoginPage() {
   const supabase = createClient()
+  const router = useRouter()
+  
+  // Listen for auth state changes and redirect
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Redirect to home, middleware will handle role-based routing
+        router.push('/')
+        router.refresh()
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase, router])
   
   // Get the redirect URL, defaulting to a safe value for SSR
   const redirectUrl = typeof window !== 'undefined' 

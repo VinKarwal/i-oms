@@ -53,7 +53,7 @@ export async function updateSession(request: NextRequest) {
       // Fetch user profile with role
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role_id, roles(name)')
+        .select('id, role_id, roles(id, name)')
         .eq('id', user.id)
         .single()
 
@@ -62,7 +62,8 @@ export async function updateSession(request: NextRequest) {
       if (!profile?.role_id) {
         url.pathname = '/pending'
       } else {
-        const roleName = (profile.roles as unknown as { name: string })?.name?.toLowerCase() || 'pending'
+        const roles = Array.isArray(profile.roles) ? profile.roles[0] : profile.roles
+        const roleName = roles?.name?.toLowerCase() || 'pending'
         url.pathname = `/${roleName}`
       }
       
@@ -73,7 +74,7 @@ export async function updateSession(request: NextRequest) {
     if (request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/dashboard') {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role_id, roles(name)')
+        .select('id, role_id, roles(id, name)')
         .eq('id', user.id)
         .single()
 
@@ -82,7 +83,8 @@ export async function updateSession(request: NextRequest) {
       if (!profile?.role_id) {
         url.pathname = '/pending'
       } else {
-        const roleName = (profile.roles as unknown as { name: string })?.name?.toLowerCase() || 'pending'
+        const roles = Array.isArray(profile.roles) ? profile.roles[0] : profile.roles
+        const roleName = roles?.name?.toLowerCase() || 'pending'
         url.pathname = `/${roleName}`
       }
       
@@ -96,7 +98,7 @@ export async function updateSession(request: NextRequest) {
     if (currentRoleRoute) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role_id, roles(name)')
+        .select('id, role_id, roles(id, name)')
         .eq('id', user.id)
         .single()
 
@@ -106,7 +108,8 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
       }
 
-      const userRoleName = (profile.roles as unknown as { name: string })?.name?.toLowerCase()
+      const roles = Array.isArray(profile.roles) ? profile.roles[0] : profile.roles
+      const userRoleName = roles?.name?.toLowerCase()
       const expectedRole = currentRoleRoute.substring(1) // Remove leading slash
 
       if (userRoleName !== expectedRole) {
