@@ -13,6 +13,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  MapPin,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
@@ -25,6 +26,7 @@ const navigationConfig = {
   Admin: [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'User Management', href: '/admin/users', icon: Users },
+    { name: 'Locations', href: '/admin/locations', icon: MapPin },
     { name: 'Inventory', href: '/admin/inventory', icon: Package },
     { name: 'Tasks', href: '/admin/tasks', icon: CheckSquare },
     { name: 'Orders & Suppliers', href: '/admin/orders', icon: ShoppingCart },
@@ -33,6 +35,7 @@ const navigationConfig = {
   ],
   Manager: [
     { name: 'Dashboard', href: '/manager', icon: LayoutDashboard },
+    { name: 'Locations', href: '/manager/locations', icon: MapPin },
     { name: 'Inventory', href: '/manager/inventory', icon: Package },
     { name: 'Tasks', href: '/manager/tasks', icon: CheckSquare },
     { name: 'Orders & Suppliers', href: '/manager/orders', icon: ShoppingCart },
