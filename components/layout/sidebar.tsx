@@ -15,6 +15,7 @@ import {
   ChevronRight,
   MapPin,
   ArrowLeftRight,
+  Scan,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
@@ -29,6 +30,7 @@ const navigationConfig = {
     { name: 'User Management', href: '/admin/users', icon: Users },
     { name: 'Locations', href: '/admin/locations', icon: MapPin },
     { name: 'Inventory', href: '/admin/inventory', icon: Package },
+    { name: 'Barcode Scanner', href: '/admin/scanner', icon: Scan },
     { name: 'Stock Movements', href: '/admin/stock-movements', icon: ArrowLeftRight },
     { name: 'Tasks', href: '/admin/tasks', icon: CheckSquare },
     { name: 'Orders & Suppliers', href: '/admin/orders', icon: ShoppingCart },
@@ -39,6 +41,7 @@ const navigationConfig = {
     { name: 'Dashboard', href: '/manager', icon: LayoutDashboard },
     { name: 'Locations', href: '/manager/locations', icon: MapPin },
     { name: 'Inventory', href: '/manager/inventory', icon: Package },
+    { name: 'Barcode Scanner', href: '/manager/scanner', icon: Scan },
     { name: 'Stock Movements', href: '/manager/stock-movements', icon: ArrowLeftRight },
     { name: 'Tasks', href: '/manager/tasks', icon: CheckSquare },
     { name: 'Orders & Suppliers', href: '/manager/orders', icon: ShoppingCart },
@@ -47,6 +50,7 @@ const navigationConfig = {
   Staff: [
     { name: 'Dashboard', href: '/staff', icon: LayoutDashboard },
     { name: 'Inventory', href: '/staff/inventory', icon: Package },
+    { name: 'Barcode Scanner', href: '/staff/scanner', icon: Scan },
     { name: 'Stock Movements', href: '/staff/stock-movements', icon: ArrowLeftRight },
     { name: 'My Tasks', href: '/staff/tasks', icon: CheckSquare },
   ],
