@@ -29,7 +29,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Camera, Scan, Trash2, CheckCircle, XCircle, Plus, Minus } from 'lucide-react'
-import Quagga from '@ericblade/quagga2'
 import { useRouter } from 'next/navigation'
 
 type Item = {
@@ -118,24 +117,31 @@ export default function ScannerClient({ items, locations, userRole }: ScannerCli
 
   // Audio feedback
   const playSound = (type: 'success' | 'error') => {
-    const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-    const audioContext = new AudioContextClass()
-    const oscillator = audioContext.createOscillator()
-    const gainNode = audioContext.createGain()
+    if (typeof window === 'undefined') return
+    
+    try {
+      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      const audioContext = new AudioContextClass()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
 
-    oscillator.connect(gainNode)
-    gainNode.connect(audioContext.destination)
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
 
-    if (type === 'success') {
-      oscillator.frequency.value = 800
-      gainNode.gain.value = 0.3
-      oscillator.start()
-      setTimeout(() => oscillator.stop(), 100)
-    } else {
-      oscillator.frequency.value = 200
-      gainNode.gain.value = 0.5
-      oscillator.start()
-      setTimeout(() => oscillator.stop(), 300)
+      if (type === 'success') {
+        oscillator.frequency.value = 800
+        gainNode.gain.value = 0.3
+        oscillator.start()
+        setTimeout(() => oscillator.stop(), 100)
+      } else {
+        oscillator.frequency.value = 200
+        gainNode.gain.value = 0.5
+        oscillator.start()
+        setTimeout(() => oscillator.stop(), 300)
+      }
+    } catch {
+      // Audio might not be supported, fail silently
+      console.log('Audio feedback not available')
     }
   }
 
@@ -146,7 +152,7 @@ export default function ScannerClient({ items, locations, userRole }: ScannerCli
     playSound(status)
     
     // Haptic feedback on mobile
-    if ('vibrate' in navigator) {
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
       if (status === 'success') {
         navigator.vibrate(50)
       } else {
@@ -215,56 +221,74 @@ export default function ScannerClient({ items, locations, userRole }: ScannerCli
   }
 
   // Start camera scanning
-  const startCamera = () => {
+  const startCamera = async () => {
+    if (typeof window === 'undefined') return
+    
     setIsCameraOpen(true)
     
-    setTimeout(() => {
+    setTimeout(async () => {
       if (videoRef.current) {
-        Quagga.init(
-          {
-            inputStream: {
-              type: 'LiveStream',
-              target: videoRef.current,
-              constraints: {
-                facingMode: 'environment',
+        try {
+          // Dynamic import for Quagga to avoid SSR issues
+          const Quagga = (await import('@ericblade/quagga2')).default
+          
+          Quagga.init(
+            {
+              inputStream: {
+                type: 'LiveStream',
+                target: videoRef.current,
+                constraints: {
+                  facingMode: 'environment',
+                },
               },
+              decoder: {
+                readers: [
+                  'code_128_reader',
+                  'ean_reader',
+                  'ean_8_reader',
+                  'code_39_reader',
+                  'upc_reader',
+                  'upc_e_reader',
+                ],
+              },
+              locate: true,
             },
-            decoder: {
-              readers: [
-                'code_128_reader',
-                'ean_reader',
-                'ean_8_reader',
-                'code_39_reader',
-                'upc_reader',
-                'upc_e_reader',
-              ],
-            },
-            locate: true,
-          },
-          (err) => {
-            if (err) {
-              console.error('Error starting camera:', err)
-              showFeedback('error', 'Failed to start camera')
-              setIsCameraOpen(false)
-              return
+            (err: Error | null) => {
+              if (err) {
+                console.error('Error starting camera:', err)
+                showFeedback('error', 'Failed to start camera')
+                setIsCameraOpen(false)
+                return
+              }
+              Quagga.start()
             }
-            Quagga.start()
-          }
-        )
+          )
 
-        Quagga.onDetected((result) => {
-          if (result.codeResult.code) {
-            handleScan(result.codeResult.code)
-            stopCamera()
-          }
-        })
+          Quagga.onDetected((result: { codeResult: { code?: string | null } }) => {
+            if (result.codeResult.code) {
+              handleScan(result.codeResult.code)
+              stopCamera()
+            }
+          })
+        } catch (error) {
+          console.error('Error loading Quagga:', error)
+          showFeedback('error', 'Failed to initialize camera scanner')
+          setIsCameraOpen(false)
+        }
       }
     }, 100)
   }
 
   // Stop camera scanning
-  const stopCamera = () => {
-    Quagga.stop()
+  const stopCamera = async () => {
+    if (typeof window === 'undefined') return
+    
+    try {
+      const Quagga = (await import('@ericblade/quagga2')).default
+      Quagga.stop()
+    } catch (error) {
+      console.error('Error stopping camera:', error)
+    }
     setIsCameraOpen(false)
   }
 
