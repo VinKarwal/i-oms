@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Package, CheckSquare, ShoppingCart, Users, BarChart3 } from 'lucide-react'
+import { LayoutDashboard, Package, CheckSquare, Scan } from 'lucide-react'
 
 interface MobileNavProps {
   role: 'Admin' | 'Manager' | 'Staff'
@@ -12,21 +12,20 @@ interface MobileNavProps {
 const navigationConfig = {
   Admin: [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Inventory', href: '/admin/inventory', icon: Package },
+    { name: 'Scanner', href: '/admin/scanner', icon: Scan },
     { name: 'Tasks', href: '/admin/tasks', icon: CheckSquare },
-    { name: 'Reports', href: '/admin/reports', icon: BarChart3 },
   ],
   Manager: [
     { name: 'Dashboard', href: '/manager', icon: LayoutDashboard },
     { name: 'Inventory', href: '/manager/inventory', icon: Package },
+    { name: 'Scanner', href: '/manager/scanner', icon: Scan },
     { name: 'Tasks', href: '/manager/tasks', icon: CheckSquare },
-    { name: 'Orders', href: '/manager/orders', icon: ShoppingCart },
-    { name: 'Reports', href: '/manager/reports', icon: BarChart3 },
   ],
   Staff: [
     { name: 'Dashboard', href: '/staff', icon: LayoutDashboard },
     { name: 'Inventory', href: '/staff/inventory', icon: Package },
+    { name: 'Scanner', href: '/staff/scanner', icon: Scan },
     { name: 'My Tasks', href: '/staff/tasks', icon: CheckSquare },
   ],
 }
